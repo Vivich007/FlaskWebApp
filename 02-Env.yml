@@ -1,0 +1,44 @@
+---
+- name: Deploy Flask App
+  hosts: FlaskServers
+  tasks:
+    - name: Ensure app directory exists
+      file:
+        path: /home/centos/FlaskWebApp/
+        state: directory
+      when: ansible_os_family == 'RedHat'
+
+    - name: Ensure app directory exists
+      file:
+        path: /home/ubuntu/FlaskWebApp/
+        state: directory
+      when: ansible_os_family == 'Debian'
+
+    - name: Install GIT
+      yum:
+        name: git
+        state: present
+      when: ansible_os_family == 'RedHat'
+
+    - name: Install GIT
+      apt:
+        name: git
+        state: present
+      when: ansible_os_family == 'Debian'
+    
+    - name: Copy Flask app files
+      copy:
+        src: /path/to/your/flask/app
+        dest: /home/centos/FlaskWebApp/
+        remote_src: yes
+    
+    - name: Install Flask dependencies
+      pip:
+        requirements: /path/to/your/flask/app/requirements.txt
+        virtualenv: /path/to/your/flask/app/venv
+
+    - name: Run Flask app
+      command: /path/to/your/flask/app/venv/bin/python /path/to/your/flask/app/app.py
+      async: 600
+      poll: 0
+...

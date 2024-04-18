@@ -1,0 +1,55 @@
+---
+- name: Install Python and Flask dependencies
+  hosts: FlaskServers
+  become: true
+  tasks:
+    - name: Update apt package
+      apt:
+        update_cache: yes
+
+    - name: Install Python 3 and pip
+      apt:
+        name: ['python3', 'python3-pip']
+        state: present
+      when: ansible_os_family == 'Debian'
+
+    - name: Install Python 3 and pip
+      yum:
+        name: ['python3', 'python3-pip']
+        state: present
+      when: ansible_os_family == 'RedHat'
+
+    - name: Install Flask and other dependencies
+      pip:
+        name: Flask
+        executable: pip3
+
+
+- name: Deploy Flask App
+  hosts: FlaskServers
+  tasks:
+    - name: Ensure app directory exists
+      file:
+        path: /home/centos/FlaskWebApp/
+        state: directory
+      when: ansible_os_family == 'RedHat'
+
+    - name: Ensure app directory exists
+      file:
+        path: /home/ubuntu/FlaskWebApp/
+        state: directory
+      when: ansible_os_family == 'Debian'
+
+    - name: Install GIT
+      yum:
+        name: git
+        state: present
+      when: ansible_os_family == 'RedHat'
+
+    - name: Install GIT
+      apt:
+        name: git
+        state: present
+      when: ansible_os_family == 'Debian'
+
+...
